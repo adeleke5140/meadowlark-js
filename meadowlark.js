@@ -1,6 +1,6 @@
 const express = require("express")
 const { engine } = require("express-handlebars")
-const getFortune = require("./lib/fortune.js")
+const handlers = require("./lib/handlers")
 
 const app = express()
 
@@ -14,26 +14,16 @@ app.set("views", "./views")
 //this middleware affects our views as well
 app.use(express.static(__dirname + "/public"))
 
-app.get("/", (req, res) => {
-  res.render("home")
-})
+app.get("/", handlers.home)
 
 //this below is a wildcard
 
-app.get("/about", (req, res) => {
-  res.render("about", { fortune: getFortune() })
-})
+app.get("/about", handlers.about)
 
-app.use((req, res) => {
-  res.status(404)
-  res.render("404")
-})
+//custom 404 page
+app.use(handlers.notFound)
 
-app.use((err, req, res, next) => {
-  console.error(err.message)
-  res.status(500)
-  res.send("500")
-})
+app.use(handlers.serverError)
 
 app.listen(port, () =>
   console.log(
